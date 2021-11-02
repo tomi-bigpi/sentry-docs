@@ -58,3 +58,60 @@ export const sortPages = (
     );
   });
 };
+
+const formatTrackingValue = input => {
+  if (input === 'true') return '1';
+  if (input === 'false') return '0';
+  return undefined;
+};
+
+
+export function startSandbox({ scenario, projectSlug, errorType }: {
+  scenario?: string,
+  projectSlug?: string,
+  errorType?: string,
+} = {}) {
+  const url = new URL('https://try.sentry-demo.com/demo/start/');
+
+  let trackingValue;
+
+  try {
+    const key = 'trackingConsent';
+    const stored = localStorage.getItem(key);
+    
+    trackingValue = formatTrackingValue(stored);
+  } catch (error) {
+    // Noop, localStorage is either not supported or denied by privacy settings.
+    trackingValue = '0';
+  }
+
+  if (trackingValue) url.searchParams.append('acceptedTracking', trackingValue);
+
+  if (scenario) url.searchParams.append('scenario', scenario);
+
+  if (projectSlug) url.searchParams.append('projectSlug', projectSlug);
+
+  if (errorType) url.searchParams.append('errorType', errorType);
+   url.searchParams.append('source', 'docs');
+
+
+  const marketingParams = marketingUrlParams();
+  const marketingParamStr = marketingParams.toString();
+  if (marketingParamStr) url.searchParams.append('extraQueryString', marketingParamStr);
+
+  window.open(url.toString(), '_blank');
+};
+
+const marketingUrlParams = (): URLSearchParams | null => {
+  const params = new URLSearchParams(window.location.search);
+  
+  const marketingParams = new URLSearchParams();
+  params.forEach((value, key) => {
+    if ([/utm_/i, /promo_/i, /gclid/i].find(matcher => matcher.test(key))) {
+      marketingParams.append(key, value);
+    }
+  });
+
+  return marketingParams;
+};
+

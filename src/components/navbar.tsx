@@ -6,6 +6,7 @@ import Search from "./search";
 import SmartLink from "./smartLink";
 
 import NavbarPlatformDropdown from "./navbarPlatformDropdown";
+import { startSandbox } from "~src/utils";
 
 type Props = {
   platforms?: string[];
@@ -24,6 +25,11 @@ export default ({ platforms }: Props): JSX.Element => {
             <SmartLink className="nav-link" to="/api/">
               API
             </SmartLink>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link className="text-primary" onClick={() => {
+              startSandbox();
+            }}>Demo</Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link href="https://sentry.io/">
